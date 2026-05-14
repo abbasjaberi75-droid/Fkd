@@ -11,16 +11,14 @@
 </head>
 <body>
 
-<button id="themeToggle" class="btn-icon theme-btn" onclick="toggleTheme()">
-    <i class="fas fa-moon" id="themeIcon"></i>
-</button>
-
 <div class="app-container">
     
     <div id="view-home" class="view-section active">
         <header class="top-header">
-            <button class="btn-icon btn-add" onclick="openAddModal()"><i class="fas fa-plus"></i></button>
-            <div class="header-filters"><button class="btn-icon"><i class="fas fa-filter"></i></button></div>
+            <button class="btn-icon" onclick="openAddModal()"><i class="fas fa-plus"></i></button>
+            <div class="header-filters">
+                <button class="btn-icon" onclick="toggleTheme()" title="تغيير المظهر"><i class="fas fa-moon theme-icon"></i></button>
+            </div>
         </header>
         
         <div class="search-bar">
@@ -36,11 +34,12 @@
         <header class="profile-header-bar">
             <button class="btn-icon" onclick="goHome()"><i class="fas fa-arrow-right"></i></button>
             <div class="profile-actions">
-                <button class="btn-icon" onclick="openDepositModal()"><i class="fas fa-dollar-sign"></i></button>
-                <button class="btn-icon" onclick="openShareModal()"><i class="fas fa-bell"></i></button>
-                <button class="btn-icon" onclick="openEditModal()"><i class="fas fa-edit"></i></button>
-                <button class="btn-icon" onclick="deleteUserBtn(currentUserId)"><i class="fas fa-trash" style="color:var(--danger-red);"></i></button>
-                <button class="btn-icon" onclick="openHistory()"><i class="fas fa-history"></i></button>
+                <button class="btn-icon" onclick="toggleTheme()" title="الوضع الليلي"><i class="fas fa-moon theme-icon"></i></button>
+                <button class="btn-icon" onclick="openDepositModal()" title="مالية"><i class="fas fa-dollar-sign"></i></button>
+                <button class="btn-icon" onclick="openShareModal()" title="مشاركة"><i class="fas fa-bell"></i></button>
+                <button class="btn-icon" onclick="openEditModal()" title="تعديل"><i class="fas fa-edit"></i></button>
+                <button class="btn-icon" onclick="deleteUserBtn(currentUserId)" title="حذف"><i class="fas fa-trash" style="color:var(--danger-red);"></i></button>
+                <button class="btn-icon" onclick="openHistory()" title="السجل"><i class="fas fa-history"></i></button>
             </div>
         </header>
 
@@ -73,7 +72,8 @@
     <div id="view-history" class="view-section">
         <header class="profile-header-bar">
             <button class="btn-icon" onclick="closeHistory()"><i class="fas fa-arrow-right"></i></button>
-            <h2>السجل</h2>
+            <h2 style="color:var(--text-main);">السجل المالي</h2>
+            <div style="width: 40px;"></div>
         </header>
         <div class="history-list" id="historyList"></div>
     </div>
@@ -142,36 +142,9 @@
         </div>
     </div>
 
-    <div class="modal-overlay" id="customAlertModal">
-        <div class="modal-content glass-effect" style="text-align: center;">
-            <div style="font-size:40px; color:var(--warning-orange); margin-bottom:10px;"><i class="fas fa-exclamation-circle"></i></div>
-            <h3 id="alertMsg" style="font-size:18px; line-height:1.5;">--</h3>
-            <button class="btn-primary" onclick="closeCustomAlert()" style="margin-top: 15px;">حسناً</button>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="customConfirmModal">
-        <div class="modal-content glass-effect" style="text-align: center;">
-            <div style="font-size:40px; color:var(--danger-red); margin-bottom:10px;"><i class="fas fa-question-circle"></i></div>
-            <h3 id="confirmMsg" style="font-size:16px; line-height:1.5;">--</h3>
-            <div class="modal-btns flex-col" style="margin-top:15px;">
-                <button class="btn-primary" id="confirmYesBtn" style="background:var(--danger-red);">نعم، متأكد</button>
-                <button class="btn-outline" onclick="closeCustomConfirm()">إلغاء</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="installPromoModal">
-        <div class="modal-content glass-effect" style="text-align: center;">
-            <img src="https://cdn-icons-png.flaticon.com/512/1043/1043306.png" width="80" style="margin-bottom:15px;">
-            <h3 style="color:var(--primary-blue);">حمل التطبيق الآن!</h3>
-            <p style="font-size:14px; color:var(--text-muted); margin:10px 0 20px;">أضف النظام إلى شاشتك الرئيسية لتجربة أسرع وأفضل وللوصول السريع.</p>
-            <div class="modal-btns flex-col">
-                <button class="btn-primary" onclick="installApp()"><i class="fas fa-download"></i> تثبيت التطبيق</button>
-                <button class="btn-outline" onclick="closeInstallPromo()">تخطي</button>
-            </div>
-        </div>
-    </div>
+    <div class="modal-overlay" id="customAlertModal"><div class="modal-content glass-effect" style="text-align: center;"><div style="font-size:40px; color:var(--warning-orange); margin-bottom:10px;"><i class="fas fa-exclamation-circle"></i></div><h3 id="alertMsg" style="font-size:18px; line-height:1.5;">--</h3><button class="btn-primary" onclick="closeCustomAlert()" style="margin-top: 15px;">حسناً</button></div></div>
+    <div class="modal-overlay" id="customConfirmModal"><div class="modal-content glass-effect" style="text-align: center;"><div style="font-size:40px; color:var(--danger-red); margin-bottom:10px;"><i class="fas fa-question-circle"></i></div><h3 id="confirmMsg" style="font-size:16px; line-height:1.5;">--</h3><div class="modal-btns flex-col" style="margin-top:15px;"><button class="btn-primary" id="confirmYesBtn" style="background:var(--danger-red);">نعم، متأكد</button><button class="btn-outline" onclick="closeCustomConfirm()">إلغاء</button></div></div></div>
+    <div class="modal-overlay" id="installPromoModal"><div class="modal-content glass-effect" style="text-align: center;"><img src="https://cdn-icons-png.flaticon.com/512/1043/1043306.png" width="80" style="margin-bottom:15px;"><h3 style="color:var(--primary-blue);">حمل التطبيق الآن!</h3><p style="font-size:14px; color:var(--text-muted); margin:10px 0 20px;">أضف النظام إلى شاشتك الرئيسية لتجربة أسرع وأفضل وللوصول السريع.</p><div class="modal-btns flex-col"><button class="btn-primary" onclick="installApp()"><i class="fas fa-download"></i> تثبيت التطبيق</button><button class="btn-outline" onclick="closeInstallPromo()">تخطي</button></div></div></div>
 
 </div>
 
