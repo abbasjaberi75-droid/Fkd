@@ -270,11 +270,12 @@ window.openProfile = function(id) {
     document.getElementById('p-tower').innerText = user.tower;
     document.getElementById('p-user').innerText = user.user;
     
+    // تم إضافة علامة الزائد (+) ليقرأ الهاتف الرقم الدولي بشكل صحيح
     let cleanPhone = user.phone.replace(/\D/g, '');
     if (cleanPhone.startsWith('0')) cleanPhone = cleanPhone.substring(1);
     let phoneLink = document.getElementById('p-phone');
     phoneLink.innerText = `+964 ${cleanPhone}`;
-    phoneLink.href = `tel:964${cleanPhone}`;
+    phoneLink.href = `tel:+964${cleanPhone}`; 
     
     let statusEl = document.getElementById('p-status');
     statusEl.innerHTML = `<i class="fas fa-circle" style="color: ${timeData.colorClass === 'status-online' ? 'var(--success-green)' : 'var(--text-main)'}"></i>`;
