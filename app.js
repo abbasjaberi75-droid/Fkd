@@ -11,7 +11,6 @@ const firebaseConfig = {
   appId: "1:294287233762:web:eb6659a6ab685293d904bb"
 };
 
-// تهيئة Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
@@ -45,7 +44,7 @@ window.closeInstallPromo = function() {
     document.getElementById('installPromoModal').classList.remove('active');
 }
 
-// ================= النوافذ المنبثقة المخصصة (Alert & Confirm) =================
+// ================= النوافذ المنبثقة =================
 window.customAlert = function(msg) {
     document.getElementById('alertMsg').innerText = msg;
     document.getElementById('customAlertModal').classList.add('active');
@@ -55,10 +54,7 @@ window.closeCustomAlert = function() {
 }
 window.customConfirm = function(msg, onYes) {
     document.getElementById('confirmMsg').innerText = msg;
-    document.getElementById('confirmYesBtn').onclick = function() {
-        closeCustomConfirm();
-        onYes();
-    };
+    document.getElementById('confirmYesBtn').onclick = function() { closeCustomConfirm(); onYes(); };
     document.getElementById('customConfirmModal').classList.add('active');
 }
 window.closeCustomConfirm = function() {
@@ -68,41 +64,43 @@ window.closeCustomConfirm = function() {
 // ================= إعدادات المظهر =================
 window.toggleTheme = function() {
     let body = document.body;
-    let icon = document.getElementById('themeIcon');
-    if (body.getAttribute('data-theme') === 'dark') {
+    let isDark = body.getAttribute('data-theme') === 'dark';
+    if (isDark) {
         body.removeAttribute('data-theme');
         localStorage.setItem('theme', 'light');
-        icon.classList.replace('fa-sun', 'fa-moon');
+        document.querySelectorAll('.theme-icon').forEach(icon => {
+            icon.classList.remove('fa-sun'); icon.classList.add('fa-moon');
+        });
     } else {
         body.setAttribute('data-theme', 'dark');
         localStorage.setItem('theme', 'dark');
-        icon.classList.replace('fa-moon', 'fa-sun');
+        document.querySelectorAll('.theme-icon').forEach(icon => {
+            icon.classList.remove('fa-moon'); icon.classList.add('fa-sun');
+        });
     }
 }
 function initTheme() {
-    let isDark = localStorage.getItem('theme') === 'dark';
-    if (isDark) {
+    if (localStorage.getItem('theme') === 'dark') {
         document.body.setAttribute('data-theme', 'dark');
-        document.getElementById('themeIcon').classList.replace('fa-moon', 'fa-sun');
+        document.querySelectorAll('.theme-icon').forEach(icon => {
+            icon.classList.remove('fa-moon'); icon.classList.add('fa-sun');
+        });
     }
 }
 
-// ================= جلب البيانات من Firebase =================
+// ================= جلب البيانات =================
 async function loadUsersFromDB() {
     try {
         const querySnapshot = await getDocs(collection(db, "subscribers"));
         users = [];
-        querySnapshot.forEach((doc) => {
-            users.push(doc.data());
-        });
-        users.sort((a,b) => b.id - a.id); // الأحدث أولاً
+        querySnapshot.forEach((doc) => { users.push(doc.data()); });
+        users.sort((a,b) => b.id - a.id);
         renderHome();
     } catch (e) {
         customAlert("حدث خطأ في جلب البيانات من الخادم، تأكد من اتصالك بالإنترنت.");
     }
 }
 
-// بدء التطبيق
 initTheme();
 loadUsersFromDB(); 
 
@@ -137,7 +135,7 @@ function showView(viewId) {
     document.getElementById(viewId).classList.add('active');
 }
 
-// ================= الوظائف الرئيسية والواجهات =================
+// ================= الوظائف الرئيسية =================
 window.goHome = function() { showView('view-home'); currentUserId = null; renderHome(); }
 
 window.renderHome = function() {
@@ -225,8 +223,6 @@ window.saveUser = async function() {
     };
     
     if(!newUser.name || !newUser.phone) { customAlert("الاسم ورقم الهاتف مطلوبان!"); return; }
-    
-    // إغلاق النافذة أثناء الحفظ وإظهار تحميل
     window.closeModals();
     
     try {
@@ -234,12 +230,16 @@ window.saveUser = async function() {
             let index = users.findIndex(u => u.id === finalId);
             if(index !== -1) { newUser.history = users[index].history; users[index] = newUser; }
         } else {
-            users.unshift(newUser); // إضافته في البداية محلياً
+            // تسجيل الرصيد الأولي في السجل مع تاريخ واضح
+            if (newUser.price > 0 || newUser.price < 0) {
+                newUser.history.push({
+                    id: Date.now(), type: 'deposit', amount: parseFloat(newUser.price),
+                    date: formatDateDisplay(new Date().toISOString()), balance: parseFloat(newUser.price)
+                });
+            }
+            users.unshift(newUser); 
         }
-        
-        // حفظ في Firebase
         await setDoc(doc(db, "subscribers", String(finalId)), newUser);
-        
         window.goHome();
     } catch(e) {
         customAlert("حدث خطأ في حفظ البيانات!");
@@ -248,7 +248,7 @@ window.saveUser = async function() {
 
 window.deleteUserBtn = function(id, event) {
     if(event) event.stopPropagation(); 
-    customConfirm('هل أنت متأكد من حذف هذا المشترك نهائياً؟ لا يمكن التراجع عن هذا الإجراء.', async () => {
+    customConfirm('هل أنت متأكد من حذف هذا المشترك نهائياً؟ لا يمكن التراجع.', async () => {
         try {
             await deleteDoc(doc(db, "subscribers", String(id)));
             users = users.filter(u => u.id !== id);
@@ -270,7 +270,6 @@ window.openProfile = function(id) {
     document.getElementById('p-tower').innerText = user.tower;
     document.getElementById('p-user').innerText = user.user;
     
-    // تم إضافة علامة الزائد (+) ليقرأ الهاتف الرقم الدولي بشكل صحيح
     let cleanPhone = user.phone.replace(/\D/g, '');
     if (cleanPhone.startsWith('0')) cleanPhone = cleanPhone.substring(1);
     let phoneLink = document.getElementById('p-phone');
@@ -326,12 +325,22 @@ window.openDepositModal = function() {
 
 window.saveTransaction = async function() {
     let user = users.find(u => u.id === currentUserId);
+    let type = document.getElementById('t-type').value;
     let amount = parseFloat(document.getElementById('t-amount').value);
     if(!amount) return;
     
-    user.price = document.getElementById('t-type').value === 'deposit' ? parseFloat(user.price) + amount : parseFloat(user.price) - amount;
+    let currentBalance = parseFloat(user.price) || 0;
+    let newBalance = type === 'deposit' ? currentBalance + amount : currentBalance - amount;
     
+    // إضافة التاريخ والوقت بوضوح للحركة المالية
+    user.history.unshift({
+        id: Date.now(), type: type, amount: amount,
+        date: formatDateDisplay(new Date().toISOString()), balance: newBalance
+    });
+    
+    user.price = newBalance;
     window.closeModals();
+    
     try {
         await setDoc(doc(db, "subscribers", String(currentUserId)), user);
         window.openProfile(currentUserId);
@@ -344,17 +353,21 @@ window.openHistory = function() {
     let user = users.find(u => u.id === currentUserId);
     let list = document.getElementById('historyList');
     list.innerHTML = '';
-    if(!user.history || user.history.length === 0) { list.innerHTML = '<p style="text-align:center;">لا يوجد سجل حركات.</p>'; } 
-    else {
+    if(!user.history || user.history.length === 0) { 
+        list.innerHTML = '<p style="text-align:center; color:var(--text-muted); margin-top:20px;">لا يوجد سجل حركات حتى الآن.</p>'; 
+    } else {
         user.history.forEach(tx => {
             let isDeposit = tx.type === 'deposit';
             list.innerHTML += `
                 <div class="history-card">
                     <div style="display:flex; align-items:center; gap:15px;">
-                        <div class="history-icon ${isDeposit ? 'bg-green' : 'bg-orange'}"><i class="fas ${isDeposit ? 'fa-money-bill-wave' : 'fa-hand-holding-usd'}"></i></div>
+                        <div class="history-icon ${isDeposit ? 'bg-green' : 'bg-orange'}">
+                            <i class="fas ${isDeposit ? 'fa-money-bill-wave' : 'fa-hand-holding-usd'}"></i>
+                        </div>
                         <div>
-                            <h4>${isDeposit ? 'إيداع' : 'إضافة دين'} ${tx.amount} د.ع</h4>
-                            <p>${tx.date}</p><p style="font-size:11px; margin-top:4px;">الرصيد الكلي بعد: ${tx.balance} د.ع</p>
+                            <h4>${isDeposit ? 'إيداع' : 'إضافة دين'} ${tx.amount.toLocaleString()} د.ع</h4>
+                            <p style="font-size:12px; color:var(--text-muted); margin-top:2px;"><i class="fas fa-clock"></i> ${tx.date || 'تاريخ غير متوفر'}</p>
+                            <p style="font-size:12px; margin-top:5px; font-weight:bold; color:var(--primary-blue);">الرصيد بعد العملية: ${tx.balance.toLocaleString()} د.ع</p>
                         </div>
                     </div>
                 </div>`;
