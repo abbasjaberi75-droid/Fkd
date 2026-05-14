@@ -1,0 +1,15 @@
+{
+  "name": "نظام إدارة المشتركين",
+  "short_name": "المشتركين",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#F4F6F9",
+  "theme_color": "#2A5C82",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/1043/1043306.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
