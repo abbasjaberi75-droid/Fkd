@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام إدارة المشتركين</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2A5C82">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+<button id="themeToggle" class="btn-icon theme-btn" onclick="toggleTheme()">
+    <i class="fas fa-moon" id="themeIcon"></i>
+</button>
+
+<div class="app-container">
+    
+    <div id="view-home" class="view-section active">
+        <header class="top-header">
+            <button class="btn-icon btn-add" onclick="openAddModal()"><i class="fas fa-plus"></i></button>
+            <div class="header-filters"><button class="btn-icon"><i class="fas fa-filter"></i></button></div>
+        </header>
+        
+        <div class="search-bar">
+            <input type="text" placeholder="بحث عن مشترك..." id="searchInput" onkeyup="filterUsers()">
+        </div>
+
+        <div class="subscribers-list" id="subscribersList">
+            <div class="loader-container"><div class="loader"></div><p>جاري تحميل البيانات...</p></div>
+        </div>
+    </div>
+
+    <div id="view-profile" class="view-section">
+        <header class="profile-header-bar">
+            <button class="btn-icon" onclick="goHome()"><i class="fas fa-arrow-right"></i></button>
+            <div class="profile-actions">
+                <button class="btn-icon" onclick="openDepositModal()"><i class="fas fa-dollar-sign"></i></button>
+                <button class="btn-icon" onclick="openShareModal()"><i class="fas fa-bell"></i></button>
+                <button class="btn-icon" onclick="openEditModal()"><i class="fas fa-edit"></i></button>
+                <button class="btn-icon" onclick="deleteUserBtn(currentUserId)"><i class="fas fa-trash" style="color:var(--danger-red);"></i></button>
+                <button class="btn-icon" onclick="openHistory()"><i class="fas fa-history"></i></button>
+            </div>
+        </header>
+
+        <div class="profile-card dark-card">
+            <div class="card-logo"><svg viewBox="0 0 24 24"><path d="M4 4h16v3H8v3.5h10v3H8v4h12v3H4z"/></svg></div>
+            <div class="card-info">
+                <div class="label-small">الاسم</div>
+                <h2 id="p-name" class="profile-name">--</h2>
+                <div class="label-small">الديون</div>
+                <p id="p-deposit" class="profile-debt">0 د.ع</p>
+            </div>
+        </div>
+
+        <div class="profile-details card">
+            <div class="detail-row"><span>الحالة</span> <span id="p-status" class="detail-value"><i class="fas fa-circle"></i> --</span></div>
+            <div class="detail-row"><span>المتبقي</span> <span id="p-days" class="detail-value">--</span></div>
+            <div class="detail-row"><span>نوع الإشتراك</span> <span id="p-package" class="text-blue">--</span></div>
+            <div class="detail-row"><span>البرج</span> <span id="p-tower" class="detail-value">--</span></div>
+            <div class="detail-row"><span>اليوزر</span> <span id="p-user" class="detail-value">--</span></div>
+            <div class="detail-row"><span>رقم الهاتف الاول</span> <a id="p-phone" href="#" class="detail-value phone-link" style="direction: ltr;">--</a></div>
+            <div class="detail-row"><span>تاريخ انتهاء الإشتراك</span> <span id="p-end-date" class="detail-value" style="direction: ltr;">--</span></div>
+        </div>
+
+        <div class="action-buttons-bottom">
+            <button class="btn-outline" onclick="openDepositModal()"><i class="fas fa-credit-card"></i> إيداع مبلغ</button>
+            <button class="btn-primary" onclick="openRenewModal()"><i class="fas fa-sync"></i> تجديد الإشتراك</button>
+        </div>
+    </div>
+
+    <div id="view-history" class="view-section">
+        <header class="profile-header-bar">
+            <button class="btn-icon" onclick="closeHistory()"><i class="fas fa-arrow-right"></i></button>
+            <h2>السجل</h2>
+        </header>
+        <div class="history-list" id="historyList"></div>
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="#" class="nav-item active" onclick="goHome()"><i class="fas fa-users"></i><span>المشتركين</span></a>
+    </nav>
+
+    <div class="modal-overlay" id="userModal">
+        <div class="modal-content glass-effect">
+            <h3 id="modalTitle">إضافة مشترك جديد</h3>
+            <input type="hidden" id="f-id">
+            <input type="text" id="f-name" class="input-field" placeholder="اسم المشترك">
+            <label style="font-size: 12px; margin-top: 10px; display: block;">رقم الهاتف</label>
+            <div class="phone-input-group">
+                <span class="country-prefix">+964</span>
+                <input type="tel" id="f-phone" class="input-field-no-border" placeholder="78 أو 77 ...">
+            </div>
+            <input type="text" id="f-package" class="input-field" placeholder="نوع الاشتراك">
+            <input type="number" id="f-price" class="input-field" placeholder="الديون (د.ع)">
+            <input type="text" id="f-tower" class="input-field" placeholder="البرج">
+            <input type="text" id="f-user" class="input-field" placeholder="اليوزر">
+            <label style="font-size: 12px; margin-top: 10px; display: block;">تاريخ التفعيل</label>
+            <input type="datetime-local" id="f-start-date" class="input-field">
+            <div class="modal-btns">
+                <button class="btn-primary" onclick="saveUser()">حفظ</button>
+                <button class="btn-outline" onclick="closeModals()">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="renewModal">
+        <div class="modal-content glass-effect">
+            <h3>تجديد الاشتراك</h3>
+            <input type="datetime-local" id="r-date" class="input-field">
+            <div class="modal-btns">
+                <button class="btn-primary" onclick="confirmRenew()">تأكيد التجديد</button>
+                <button class="btn-outline" onclick="closeModals()">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="shareModal">
+        <div class="modal-content glass-effect">
+            <h3>مشاركة</h3>
+            <textarea id="shareText" class="input-field" rows="6"></textarea>
+            <div class="modal-btns flex-col">
+                <button class="btn-primary" onclick="sendWhatsApp()"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+                <button class="btn-outline" onclick="closeModals()">إغلاق</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="depositModal">
+        <div class="modal-content glass-effect">
+            <h3>العمليات المالية</h3>
+            <select id="t-type" class="input-field">
+                <option value="deposit">إيداع</option>
+                <option value="debt">دين</option>
+            </select>
+            <input type="number" id="t-amount" class="input-field" placeholder="المبلغ">
+            <div class="modal-btns">
+                <button class="btn-primary" onclick="saveTransaction()">تأكيد</button>
+                <button class="btn-outline" onclick="closeModals()">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="customAlertModal">
+        <div class="modal-content glass-effect" style="text-align: center;">
+            <div style="font-size:40px; color:var(--warning-orange); margin-bottom:10px;"><i class="fas fa-exclamation-circle"></i></div>
+            <h3 id="alertMsg" style="font-size:18px; line-height:1.5;">--</h3>
+            <button class="btn-primary" onclick="closeCustomAlert()" style="margin-top: 15px;">حسناً</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="customConfirmModal">
+        <div class="modal-content glass-effect" style="text-align: center;">
+            <div style="font-size:40px; color:var(--danger-red); margin-bottom:10px;"><i class="fas fa-question-circle"></i></div>
+            <h3 id="confirmMsg" style="font-size:16px; line-height:1.5;">--</h3>
+            <div class="modal-btns flex-col" style="margin-top:15px;">
+                <button class="btn-primary" id="confirmYesBtn" style="background:var(--danger-red);">نعم، متأكد</button>
+                <button class="btn-outline" onclick="closeCustomConfirm()">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="installPromoModal">
+        <div class="modal-content glass-effect" style="text-align: center;">
+            <img src="https://cdn-icons-png.flaticon.com/512/1043/1043306.png" width="80" style="margin-bottom:15px;">
+            <h3 style="color:var(--primary-blue);">حمل التطبيق الآن!</h3>
+            <p style="font-size:14px; color:var(--text-muted); margin:10px 0 20px;">أضف النظام إلى شاشتك الرئيسية لتجربة أسرع وأفضل وللوصول السريع.</p>
+            <div class="modal-btns flex-col">
+                <button class="btn-primary" onclick="installApp()"><i class="fas fa-download"></i> تثبيت التطبيق</button>
+                <button class="btn-outline" onclick="closeInstallPromo()">تخطي</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>
