@@ -314,7 +314,28 @@ window.sendWhatsApp = function() {
 
 window.openShareModal = function() {
     let user = users.find(u => u.id === currentUserId);
-    document.getElementById('shareText').value = `مرحباً ${user.name}، ينتهي اشتراكك بتاريخ ${formatDateDisplay(user.endDate)}.`;
+    
+    let now = new Date();
+    let end = new Date(user.endDate);
+    let diffMs = end - now;
+    let timeRemainingText = "";
+    
+    if (diffMs > 0) {
+        let diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+        let diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        timeRemainingText = `وما زال أمامك ${diffDays} يوم و ${diffHours} ساعة على نهاية الاشتراك.`;
+    } else {
+        timeRemainingText = `وقد انتهى الاشتراك.`;
+    }
+
+    let balance = parseFloat(user.price) || 0;
+    let balanceType = balance >= 0 ? "(ايداع)" : "(دين)";
+    let balanceAbs = Math.abs(balance).toLocaleString();
+    let dateOnly = formatDateDisplay(user.endDate).split(' ')[0];
+
+    let message = `مرحباً ${user.name}،\n\nنود إبلاغك بأن اشتراكك من النوع ${user.package || 'غير محدد'} ينتهي في تاريخ ${dateOnly}، ${timeRemainingText}\n\nكما نذكرك بمستحقاتك المالية، التي تبلغ حاليًا ${balanceAbs} د.ع ${balanceType}.\n\nفي حال احتجت أي مساعدة أو لديك أي استفسارات، لا تتردد بالتواصل معنا.\n\nتحياتنا`;
+    
+    document.getElementById('shareText').value = message;
     document.getElementById('shareModal').classList.add('active');
 }
 
