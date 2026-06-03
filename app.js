@@ -94,7 +94,6 @@ async function loadUsersFromDB() {
         const querySnapshot = await getDocs(collection(db, "subscribers"));
         users = [];
         querySnapshot.forEach((doc) => { users.push(doc.data()); });
-        users.sort((a,b) => b.id - a.id);
         renderHome();
     } catch (e) {
         customAlert("حدث خطأ في جلب البيانات من الخادم، تأكد من اتصالك بالإنترنت.");
@@ -141,6 +140,9 @@ window.goHome = function() { showView('view-home'); currentUserId = null; render
 window.renderHome = function() {
     const list = document.getElementById('subscribersList');
     list.innerHTML = '';
+    
+    users.sort((a, b) => new Date(a.endDate) - new Date(b.endDate));
+
     if(users.length === 0) {
         list.innerHTML = '<p style="text-align:center; color:var(--text-muted); margin-top:20px;">لا يوجد مشتركين.</p>';
         return;
