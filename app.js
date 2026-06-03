@@ -155,7 +155,7 @@ window.renderHome = function() {
         card.innerHTML = `
             <div class="user-info">
                 <h4>${user.name}</h4>
-                <p><span class="${timeData.colorClass}">● ${timeData.status}</span> | ${Number(user.price).toLocaleString()} د.ع</p>
+                <p><span class="${timeData.colorClass}">● ${timeData.text}</span> | ${Number(user.price).toLocaleString()} د.ع</p>
             </div>
             <div class="user-actions-list">
                 <button class="btn-icon-small edit-btn" onclick="openEditModalFromList(${user.id}, event)"><i class="fas fa-pen"></i></button>
